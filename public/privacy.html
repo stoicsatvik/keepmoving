@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="theme-color" content="#0B0D10"/>
+<meta name="description" content="How KeepMoving handles GPS, game rooms and player information."/>
+<link rel="stylesheet" href="legal.css"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<title>Privacy | KeepMoving</title>
+</head>
+<body>
+<header><a href="./">KEEP<span>MOVING</span></a></header>
+<main>
+<p class="eyebrow">THE RULES / YOUR DATA</p>
+<h1>YOUR LOCATION.<br/>YOUR CHOICE.</h1>
+<p class="meta">PRIVACY NOTICE · 1 NOVEMBER 2026 · EARLY ACCESS PROTOTYPE</p>
+<p class="note">KeepMoving is an experimental location-based game. The map and live tracking are for friends who actively choose to play. Do not join a round unless you understand how location sharing works.</p>
+<h2>1. Information handled during a match</h2>
+<p>When you create or join a room, the app processes your chosen player name, room membership, team, match settings and game events such as tag requests. Your browser stores a random player-session credential, your player name and the last room code in local storage, so it can reconnect to a room.</p>
+<p>When you grant location permission, your device sends latitude, longitude, reported GPS accuracy and update time to the KeepMoving game backend. The host's position also becomes the chosen centre of the circular play area.</p>
+<h2>2. Who can see what</h2>
+<p>Other members of your room can see player names, assigned teams and captured status. During scheduled reveal windows, Hunters can receive approximate, short-lived Shadow location hints. Exact GPS positions are used server-side for game mechanics and nearby capture verification; they are not intended to be continuously broadcast to everyone in the room.</p>
+<p>The public homepage's map and chat are fictional examples. They do not use live player locations.</p>
+<h2>3. How information is stored</h2>
+<p>The static website is served by GitHub Pages. Room and location data are handled by Supabase in the game's separated database tables. Game maps request tiles from OpenStreetMap's tile service, which receives network requests when the map is displayed. Fonts are requested from Google Fonts. These providers may handle technical information such as IP addresses according to their own policies.</p>
+<h2>4. Retention and deletion</h2>
+<p>Successful match completion or host-initiated ending triggers deletion of individual player GPS position records. However, a room's centre coordinates, player names, match records and other game metadata may remain in the database until separate cleanup. Abandoned rooms can retain records when their match never finishes. This early prototype does not promise automatic deletion of every record after a fixed interval until retention scheduling has been verified.</p>
+<p>Leaving a room stops browser GPS updates and clears the room code and player credential stored in this browser, but it does not erase existing server records. Your saved display name may remain on your device until you clear the site's storage.</p>
+<h2>5. Your controls</h2>
+<ul>
+<li>Only enable location permission when you intend to play. You can revoke it at any time through your browser's site permissions.</li>
+<li>Keep the game open only while participating. Leaving the app or locking a phone may interrupt location updates, but does not guarantee immediate server-side deletion.</li>
+<li>Use a nickname rather than a full legal name. Do not share private session credentials with anyone.</li>
+<li>To clear your browser's stored player name and session information, clear site data for KeepMoving in your browser settings.</li>
+</ul>
+<h2>6. Safety and minors</h2>
+<p>Participants under 18 should have parental or guardian permission and appropriate supervision. Playing safely, remaining in public permitted areas and obtaining consent from everyone in the match are essential.</p>
+<h2>7. Privacy requests</h2>
+<p>KeepMoving is a hobby-stage project. For project questions, see the <a href="https://github.com/stoicsatvik/keepmoving" target="_blank" rel="noopener noreferrer">source repository</a>. Do not post names, GPS coordinates, room credentials or other private data in public GitHub issues. A confidential privacy-request contact channel has not yet been published; this is a limitation of the prototype, and should be resolved before public-scale launch.</p>
+</main>
+<footer><a href="./">← BACK TO THE GAME</a><a href="terms.html">GAME RULES & TERMS</a><a href="https://github.com/stoicsatvik/keepmoving">SOURCE</a></footer>
+</body></html>
