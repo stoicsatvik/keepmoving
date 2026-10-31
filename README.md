@@ -5,22 +5,22 @@ Mobile-first GPS manhunt with player-selected radius (100 m–100 km), time (5�
 ## Stack
 - Vite + vanilla JavaScript UI
 - MapLibre GL JS over OpenStreetMap raster tiles
-- Supabase anonymous auth + Postgres + one Edge Function
+- Supabase Postgres + one Edge Function with signed random guest-session credentials
 - Edge Function owns rules and restricts access to location data
 - Foreground geolocation only (mobile browsers limit background updates)
 
 ## Run locally
-1. Create a Supabase project. In **Authentication → Providers → Anonymous**, enable anonymous sign-ins.
-2. Run `supabase/migrations/202611010001_keepmoving.sql` in the SQL Editor.
-3. Deploy the Edge Function from `supabase/functions/game/index.ts` via Supabase CLI:
+1. Use the **CampusConnect** Supabase project for now (tables prefixed `km_`), without changing its existing schema. Anonymous Auth sign-ins are not required.
+2. Apply `supabase/migrations/202611010001_keepmoving.sql` to the project.
+3. Deploy the Edge Function from `supabase/functions/keepmoving-game/index.ts` via Supabase CLI:
    ```bash
    npm install
    npx supabase login
    npx supabase link --project-ref YOUR_PROJECT_REF
-   npx supabase functions deploy game
+   npx supabase functions deploy keepmoving-game --no-verify-jwt
    ```
-   Make sure JWT verification is enabled for this function. The deployment supplies `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to it; **never** expose the service role key in Vite.
-4. Copy `.env.example` to `.env.local` and fill in `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+   JWT verification is deliberately disabled at the gateway because the Edge Function validates its own cryptographically random, per-player guest tokens against SHA-256 hashes. Never disable authentication inside the function. The deployment supplies `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to it; **never** expose the service role key in Vite.
+4. For local dev, copy `.env.example` to `.env.local`. Production uses `.env.production` containing only Supabase's public project URL and publishable key.
 5. `npm run dev`. To play on multiple phones, deploy the Vite site to an HTTPS host (for example Vercel); HTTP phone-to-laptop geolocation normally won't work.
 
 ## Gameplay rules (MVP)
@@ -44,3 +44,6 @@ Mobile-first GPS manhunt with player-selected radius (100 m–100 km), time (5�
 ## Next before public launch
 - Schedule the included purge script for abandoned/old games; add spam/rate limits, admin moderation, map tile provider compliant with actual traffic, server-side transactional game transitions, and stronger capture validation.
 - Location is sensitive information. Get explicit consent from all players and set a safe play boundary.
+
+## Authentication & privacy
+This build deliberately avoids Supabase Auth configuration. It issues a random 256-bit per-room guest token per player, stores only a SHA-256 hash in `km_players`, and requires that token for room state and writes. The token is stored on the player's device in localStorage. Do not share tokens. Only share room codes. This is a friends-only alpha and needs IP/session rate limiting before wide release.
