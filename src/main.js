@@ -303,6 +303,9 @@ function initMap(){
     map.addSource("zone",{type:"geojson",data:circleGeoJSON(g.center_lat,g.center_lng,g.zone_radius_m)});
     map.addLayer({id:"zone-fill",type:"fill",source:"zone",paint:{"fill-color":"#3bf1ae","fill-opacity":0.10}});
     map.addLayer({id:"zone-line",type:"line",source:"zone",paint:{"line-color":"#3bf1ae","line-width":2.5,"line-dasharray":[4,2]}});
+    const outline=circleGeoJSON(g.center_lat,g.center_lng,g.radius_m).features[0].geometry.coordinates[0];
+    const bounds=outline.reduce((b,p)=>b.extend(p),new maplibregl.LngLatBounds(outline[0],outline[0]));
+    map.fitBounds(bounds,{padding:46,maxZoom:15,duration:0});
     drawMap();
   });
 }
