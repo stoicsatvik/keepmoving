@@ -47,3 +47,15 @@ Mobile-first GPS manhunt with player-selected radius (100 m–100 km), time (5�
 
 ## Authentication & privacy
 This build deliberately avoids Supabase Auth configuration. It issues a random 256-bit per-room guest token per player, stores only a SHA-256 hash in `km_players`, and requires that token for room state and writes. The token is stored on the player's device in localStorage. Do not share tokens. Only share room codes. This is a friends-only alpha and needs IP/session rate limiting before wide release.
+
+## GitHub Pages frontend hosting
+
+The frontend is automatically built and published by `.github/workflows/deploy-pages.yml` on each commit to `main`.
+
+**One-time GitHub setting**: open [Repository Settings → Pages](https://github.com/stoicsatvik/keepmoving/settings/pages). Under **Build and deployment → Source** select **GitHub Actions**. This initial activation is required by GitHub before the workflow can publish. Then open [Actions](https://github.com/stoicsatvik/keepmoving/actions/workflows/deploy-pages.yml), select **Run workflow** if the first build failed, and check for a green deployment.
+
+Expected URL: https://stoicsatvik.github.io/keepmoving/
+
+The Vite `base` is intentionally `/keepmoving/` so JavaScript/CSS files resolve from the GitHub Pages subdirectory. Only the *publishable* Supabase key is bundled into the frontend. The secret service-role key is used exclusively on the Supabase Edge Function.
+
+For a separate Cloudflare Pages deployment, use the GitHub repository as source with `npm run build`, output `dist`, and override the Vite base with `npm run build -- --base=/` because Cloudflare Pages serves from domain root. Do not move the Supabase Edge Function to the frontend.
