@@ -179,7 +179,7 @@ function shell(){
 async function startRoom(){
   stopRoom();shell();
   try{
-    await refresh();startGps();pollTimer=setInterval(refresh,5000);clockTimer=setInterval(updateClock,1000);
+    await refresh();startGps();pollTimer=setInterval(refresh,10000);clockTimer=setInterval(updateClock,1000);
   }catch(e){status(e.message,"error");throw e}
 }
 function startGps(){
