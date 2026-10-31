@@ -465,6 +465,12 @@
 .lp-footer>span{font-size:11px;color:#76808A}
 .lp-preview-paused .lp-safe-zone,.lp-preview-paused .lp-pin,.lp-preview-paused .lp-radar-origin:before,.lp-preview-paused .lp-radar-origin:after,.lp-preview-paused .lp-rec-dot{animation-play-state:paused}
 .lp a:focus-visible,.lp button:focus-visible,.lp summary:focus-visible{outline:3px solid #F6C2A5;outline-offset:3px}
+@keyframes lp-hero-reveal{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes lp-city-drift{0%,100%{transform:scale(1.01) translateX(0)}50%{transform:scale(1.04) translateX(-.6%)}}
+@keyframes lp-message-drift{0%,100%{transform:rotate(4deg) translateY(0)}50%{transform:rotate(3deg) translateY(-9px)}}
+.lp-hero-inner{animation:lp-hero-reveal 1s cubic-bezier(.25,.8,.2,1) both}
+.lp-hero-city{animation:lp-city-drift 24s ease-in-out infinite}
+.lp-hero-bubble{animation:lp-message-drift 8s ease-in-out infinite}
 @keyframes lp-zone-contract{0%,21%{transform:scale(1)}44%{transform:scale(.8)}70%{transform:scale(.56)}100%{transform:scale(.35)}}
 @keyframes lp-hunter-run{0%{transform:translate(-14%,14%)}20%{transform:translate(-4%,-9%)}42%{transform:translate(100%,-160%)}67%{transform:translate(230%,-210%)}100%{transform:translate(310%,-260%)}}
 @keyframes lp-shadow-run{0%{transform:translate(0,0)}22%{transform:translate(-90%,50%)}48%{transform:translate(-190%,10%)}75%{transform:translate(-260%,115%)}100%{transform:translate(-330%,145%)}}
