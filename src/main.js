@@ -25,7 +25,7 @@ const status = (msg,type="info") => {
 };
 async function request(action, extra={}) {
   if(!configured) throw new Error("Add Supabase environment variables before playing.");
-  const {data,error}=await supabase.functions.invoke("game", {body:{action,code:roomCode,...extra}});
+  const {data,error}=await supabase.functions.invoke("keepmoving-game", {body:{action,code:roomCode,...extra}});
   if(error){
     let message=error.message || "Request failed";
     try { const body=await error.context?.json();if(body?.error)message=body.error; }catch{}
