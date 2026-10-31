@@ -156,7 +156,7 @@ serve(async (req) => {
     }
 
     if (action === "location") {
-      if (game.status === "finished") return json({ok:true});
+      if (game.status === "finished" || me.captured_at) return json({ok:true});
       const lat = coordinate(payload.lat,-90,90,"latitude");
       const lng = coordinate(payload.lng,-180,180,"longitude");
       const accuracy_m = coordinate(payload.accuracy_m,0,5000,"GPS accuracy");
@@ -201,6 +201,8 @@ serve(async (req) => {
       if (game.status !== "finished") queryError(await admin.from("games").update({
         status:"finished",winner:"cancelled",finished_at:new Date().toISOString(),
       }).eq("id",game.id));
+      const rosterForPurge = queryError(await admin.from("players").select("id").eq("game_id",game.id));
+      if (rosterForPurge.length) queryError(await admin.from("positions").delete().in("player_id",rosterForPurge.map((p:RecordAny)=>p.id)));
       return json({ok:true});
     }
 
@@ -216,6 +218,8 @@ serve(async (req) => {
           status:"finished",winner,finished_at:new Date().toISOString(),
         }).eq("id",game.id).eq("status","active"));
         state = {...state,phase:"finished",reveal_active:false};
+        const idsToPurge = roster.map((p:RecordAny)=>p.id);
+        if (idsToPurge.length) queryError(await admin.from("positions").delete().in("player_id",idsToPurge));
       }
     }
     const myPosition = queryError(await admin.from("positions").select("lat,lng,accuracy_m,updated_at").eq("player_id",me.id).maybeSingle());
