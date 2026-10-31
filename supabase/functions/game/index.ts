@@ -98,7 +98,7 @@ serve(async (req) => {
       const center_lng = coordinate(payload.lng, -180, 180, "longitude");
       let game: RecordAny | null = null;
       for (let i=0;i<4;i++) {
-        const result = await admin.from("games").insert({
+        const result = await admin.from("km_games").insert({
           code: randomCode(), host_user_id: user.id,
           center_lat, center_lng, radius_m, duration_s, headstart_s, reveal_s, shrink_s,
         }).select().single();
@@ -106,7 +106,7 @@ serve(async (req) => {
         if (result.error.code !== "23505") bad(result.error.message, 500);
       }
       if (!game) bad("Could not create a unique room", 500);
-      queryError(await admin.from("players").insert({
+      queryError(await admin.from("km_players").insert({
         game_id: game.id, user_id: user.id, name, role: "hunter",
       }));
       return json({ code: game.code });
@@ -114,24 +114,22 @@ serve(async (req) => {
 
     const code = String(payload.code || "").trim().toUpperCase();
     if (!/^[A-Z2-9]{6}$/.test(code)) bad("Enter a valid six-character room code");
-    const game = queryError(await admin.from("games").select("*").eq("code", code).maybeSingle());
+    const game = queryError(await admin.from("km_games").select("*").eq("code", code).maybeSingle());
     if (!game) bad("Room not found", 404);
 
     if (action === "join") {
       const name = String(payload.name || "").trim().slice(0,24);
       if (!name) bad("Enter your name");
-      const existing = queryError(await admin.from("players").select("id").eq("game_id",game.id).eq("user_id",user.id).maybeSingle());
+      const existing = queryError(await admin.from("km_players").select("id").eq("game_id",game.id).eq("user_id",user.id).maybeSingle());
       if (existing) return json({ code });
       if (game.status !== "waiting") bad("Game already started");
-      const count = queryError(await admin.from("players").select("id",{count:"exact",head:true}).eq("game_id",game.id));
-      // Count is returned as a separate property by Supabase; fetch below to avoid a stale count.
-      const roster = queryError(await admin.from("players").select("id").eq("game_id",game.id));
+      const roster = queryError(await admin.from("km_players").select("id").eq("game_id",game.id));
       if (roster.length >= MAX_PLAYERS) bad("Room is full (20 players)");
-      queryError(await admin.from("players").insert({ game_id: game.id, user_id: user.id, name, role:"shadow" }));
+      queryError(await admin.from("km_players").insert({ game_id: game.id, user_id: user.id, name, role:"shadow" }));
       return json({ code });
     }
 
-    const me = queryError(await admin.from("players").select("*").eq("game_id",game.id).eq("user_id",user.id).maybeSingle());
+    const me = queryError(await admin.from("km_players").select("*").eq("game_id",game.id).eq("user_id",user.id).maybeSingle());
     if (!me) bad("Join the lobby first", 403);
     const isHost = game.host_user_id === user.id;
 
@@ -139,19 +137,19 @@ serve(async (req) => {
       if (!isHost || game.status !== "waiting") bad("Only the host may assign roles before the match", 403);
       const role = String(payload.role || "");
       if (role !== "hunter" && role !== "shadow") bad("Invalid role");
-      const target = queryError(await admin.from("players").select("id").eq("game_id",game.id).eq("id",payload.target_id).maybeSingle());
+      const target = queryError(await admin.from("km_players").select("id").eq("game_id",game.id).eq("id",payload.target_id).maybeSingle());
       if (!target) bad("Player not in room");
-      queryError(await admin.from("players").update({role}).eq("id",target.id));
+      queryError(await admin.from("km_players").update({role}).eq("id",target.id));
       return json({ ok:true });
     }
 
     if (action === "start") {
       if (!isHost || game.status !== "waiting") bad("Only host can start a waiting room", 403);
-      const roster = queryError(await admin.from("players").select("role").eq("game_id",game.id));
+      const roster = queryError(await admin.from("km_players").select("role").eq("game_id",game.id));
       if (roster.length < 2 || !roster.some((p:RecordAny)=>p.role==="hunter") || !roster.some((p:RecordAny)=>p.role==="shadow"))
         bad("Need at least one Hunter and one Shadow");
       const started_at = new Date().toISOString();
-      queryError(await admin.from("games").update({status:"active",started_at}).eq("id",game.id).eq("status","waiting"));
+      queryError(await admin.from("km_games").update({status:"active",started_at}).eq("id",game.id).eq("status","waiting"));
       return json({ok:true});
     }
 
@@ -160,16 +158,16 @@ serve(async (req) => {
       const lat = coordinate(payload.lat,-90,90,"latitude");
       const lng = coordinate(payload.lng,-180,180,"longitude");
       const accuracy_m = coordinate(payload.accuracy_m,0,5000,"GPS accuracy");
-      queryError(await admin.from("positions").upsert({player_id:me.id,lat,lng,accuracy_m,updated_at:new Date().toISOString()}));
+      queryError(await admin.from("km_positions").upsert({player_id:me.id,lat,lng,accuracy_m,updated_at:new Date().toISOString()}));
       return json({ok:true});
     }
 
     if (action === "request_tag") {
       const c = clock(game);
       if (c.phase !== "hunt" || me.role !== "hunter" || me.captured_at) bad("Only active Hunters can request a tag");
-      const target = queryError(await admin.from("players").select("*").eq("id",payload.target_id).eq("game_id",game.id).maybeSingle());
+      const target = queryError(await admin.from("km_players").select("*").eq("id",payload.target_id).eq("game_id",game.id).maybeSingle());
       if (!target || target.role !== "shadow" || target.captured_at) bad("Target must be an uncaptured Shadow");
-      const pos = queryError(await admin.from("positions").select("*").in("player_id",[me.id,target.id]));
+      const pos = queryError(await admin.from("km_positions").select("*").in("player_id",[me.id,target.id]));
       const a = pos.find((p:RecordAny)=>p.player_id===me.id), b = pos.find((p:RecordAny)=>p.player_id===target.id);
       if (!a || !b || [a,b].some((p:RecordAny)=>Date.now()-Date.parse(p.updated_at)>GPS_TTL_MS))
         bad("Both players need recent GPS fixes. Keep both phones open.");
@@ -177,58 +175,58 @@ serve(async (req) => {
         bad("GPS accuracy too low for proximity tagging. Move to open space.");
       if (haversine(a,b) > Math.min(80,20+a.accuracy_m+b.accuracy_m))
         bad("Not close enough to request a tag");
-      const pending = queryError(await admin.from("tag_requests").select("id,created_at").eq("game_id",game.id).eq("hunter_player_id",me.id).eq("shadow_player_id",target.id).eq("status","pending").order("created_at",{ascending:false}).limit(1));
+      const pending = queryError(await admin.from("km_tag_requests").select("id,created_at").eq("game_id",game.id).eq("hunter_player_id",me.id).eq("shadow_player_id",target.id).eq("status","pending").order("created_at",{ascending:false}).limit(1));
       if (pending.some((t:RecordAny)=>Date.now()-Date.parse(t.created_at)<60000)) bad("A tag request is already pending");
-      queryError(await admin.from("tag_requests").insert({game_id:game.id,hunter_player_id:me.id,shadow_player_id:target.id}));
+      queryError(await admin.from("km_tag_requests").insert({game_id:game.id,hunter_player_id:me.id,shadow_player_id:target.id}));
       return json({ok:true});
     }
 
     if (action === "respond_tag") {
-      const tag = queryError(await admin.from("tag_requests").select("*").eq("id",payload.tag_id).eq("game_id",game.id).maybeSingle());
+      const tag = queryError(await admin.from("km_tag_requests").select("*").eq("id",payload.tag_id).eq("game_id",game.id).maybeSingle());
       if (!tag || tag.shadow_player_id !== me.id || tag.status !== "pending" || me.captured_at)
         bad("Not an active tag request",403);
       if (Date.now()-Date.parse(tag.created_at)>60000) bad("Tag request expired");
       const accept = payload.accept === true;
-      queryError(await admin.from("tag_requests").update({
+      queryError(await admin.from("km_tag_requests").update({
         status:accept?"accepted":"declined",resolved_at:new Date().toISOString(),
       }).eq("id",tag.id).eq("status","pending"));
-      if (accept) queryError(await admin.from("players").update({captured_at:new Date().toISOString()}).eq("id",me.id).is("captured_at",null));
+      if (accept) queryError(await admin.from("km_players").update({captured_at:new Date().toISOString()}).eq("id",me.id).is("captured_at",null));
       return json({ok:true});
     }
 
     if (action === "finish") {
       if (!isHost) bad("Only host may end the match",403);
-      if (game.status !== "finished") queryError(await admin.from("games").update({
+      if (game.status !== "finished") queryError(await admin.from("km_games").update({
         status:"finished",winner:"cancelled",finished_at:new Date().toISOString(),
       }).eq("id",game.id));
-      const rosterForPurge = queryError(await admin.from("players").select("id").eq("game_id",game.id));
-      if (rosterForPurge.length) queryError(await admin.from("positions").delete().in("player_id",rosterForPurge.map((p:RecordAny)=>p.id)));
+      const rosterForPurge = queryError(await admin.from("km_players").select("id").eq("game_id",game.id));
+      if (rosterForPurge.length) queryError(await admin.from("km_positions").delete().in("player_id",rosterForPurge.map((p:RecordAny)=>p.id)));
       return json({ok:true});
     }
 
     if (action !== "state") bad("Unknown action",404);
-    const roster = queryError(await admin.from("players").select("id,name,role,captured_at,joined_at").eq("game_id",game.id).order("joined_at"));
+    const roster = queryError(await admin.from("km_players").select("id,name,role,captured_at,joined_at").eq("game_id",game.id).order("joined_at"));
     let state = clock(game);
     let winner = game.winner;
     if (game.status === "active") {
       const uncaptured = roster.filter((p:RecordAny)=>p.role==="shadow"&&!p.captured_at);
       if (!uncaptured.length || state.remaining_s===0) {
         winner = uncaptured.length ? "shadows" : "hunters";
-        queryError(await admin.from("games").update({
+        queryError(await admin.from("km_games").update({
           status:"finished",winner,finished_at:new Date().toISOString(),
         }).eq("id",game.id).eq("status","active"));
         state = {...state,phase:"finished",reveal_active:false};
         const idsToPurge = roster.map((p:RecordAny)=>p.id);
-        if (idsToPurge.length) queryError(await admin.from("positions").delete().in("player_id",idsToPurge));
+        if (idsToPurge.length) queryError(await admin.from("km_positions").delete().in("player_id",idsToPurge));
       }
     }
-    const myPosition = queryError(await admin.from("positions").select("lat,lng,accuracy_m,updated_at").eq("player_id",me.id).maybeSingle());
+    const myPosition = queryError(await admin.from("km_positions").select("lat,lng,accuracy_m,updated_at").eq("player_id",me.id).maybeSingle());
     let revealed: RecordAny[] = [];
     // DO NOT fetch/send other players' GPS except during the explicit reveal window.
     if (me.role==="hunter" && state.reveal_active) {
       const alive = roster.filter((p:RecordAny)=>p.role==="shadow"&&!p.captured_at).map((p:RecordAny)=>p.id);
       if (alive.length) {
-        const positions = queryError(await admin.from("positions").select("player_id,lat,lng,accuracy_m,updated_at").in("player_id",alive));
+        const positions = queryError(await admin.from("km_positions").select("player_id,lat,lng,accuracy_m,updated_at").in("player_id",alive));
         revealed = positions.filter((p:RecordAny)=>Date.now()-Date.parse(p.updated_at)<GPS_TTL_MS)
           .map((p:RecordAny)=>({
             player_id:p.player_id,
@@ -239,7 +237,7 @@ serve(async (req) => {
           }));
       }
     }
-    const tags = queryError(await admin.from("tag_requests").select("id,hunter_player_id,shadow_player_id,status,created_at")
+    const tags = queryError(await admin.from("km_tag_requests").select("id,hunter_player_id,shadow_player_id,status,created_at")
       .eq("game_id",game.id).or('hunter_player_id.eq.'+me.id+',shadow_player_id.eq.'+me.id)
       .order("created_at",{ascending:false}).limit(12));
     return json({
