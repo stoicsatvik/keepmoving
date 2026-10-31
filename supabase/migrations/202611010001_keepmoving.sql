@@ -1,7 +1,7 @@
 -- Run this once in the Supabase SQL editor. Data is never directly readable by browsers.
 create extension if not exists pgcrypto;
 
-create table if not exists public.games (
+create table if not exists public.km_games (
   id uuid primary key default gen_random_uuid(),
   code text not null unique,
   host_user_id uuid not null,
@@ -19,9 +19,9 @@ create table if not exists public.games (
   finished_at timestamptz
 );
 
-create table if not exists public.players (
+create table if not exists public.km_players (
   id uuid primary key default gen_random_uuid(),
-  game_id uuid not null references public.games(id) on delete cascade,
+  game_id uuid not null references public.km_games(id) on delete cascade,
   user_id uuid not null,
   name text not null check (char_length(name) between 1 and 24),
   role text not null check (role in ('hunter','shadow')),
@@ -30,33 +30,33 @@ create table if not exists public.players (
   unique(game_id, user_id)
 );
 
-create table if not exists public.positions (
-  player_id uuid primary key references public.players(id) on delete cascade,
+create table if not exists public.km_positions (
+  player_id uuid primary key references public.km_players(id) on delete cascade,
   lat double precision not null,
   lng double precision not null,
   accuracy_m real not null,
   updated_at timestamptz not null default now()
 );
 
-create table if not exists public.tag_requests (
+create table if not exists public.km_tag_requests (
   id uuid primary key default gen_random_uuid(),
-  game_id uuid not null references public.games(id) on delete cascade,
-  hunter_player_id uuid not null references public.players(id) on delete cascade,
-  shadow_player_id uuid not null references public.players(id) on delete cascade,
+  game_id uuid not null references public.km_games(id) on delete cascade,
+  hunter_player_id uuid not null references public.km_players(id) on delete cascade,
+  shadow_player_id uuid not null references public.km_players(id) on delete cascade,
   status text not null default 'pending' check (status in ('pending','accepted','declined')),
   created_at timestamptz not null default now(),
   resolved_at timestamptz
 );
 
-create index if not exists players_game_idx on public.players(game_id);
-create index if not exists tag_requests_game_idx on public.tag_requests(game_id);
+create index if not exists km_players_game_idx on public.km_players(game_id);
+create index if not exists km_tag_requests_game_idx on public.km_tag_requests(game_id);
 
-alter table public.games enable row level security;
-alter table public.players enable row level security;
-alter table public.positions enable row level security;
-alter table public.tag_requests enable row level security;
+alter table public.km_games enable row level security;
+alter table public.km_players enable row level security;
+alter table public.km_positions enable row level security;
+alter table public.km_tag_requests enable row level security;
 -- NO public RLS policies: all room access is checked by the server Edge Function.
-revoke all on public.games from anon, authenticated;
-revoke all on public.players from anon, authenticated;
-revoke all on public.positions from anon, authenticated;
-revoke all on public.tag_requests from anon, authenticated;
+revoke all on public.km_games from anon, authenticated;
+revoke all on public.km_players from anon, authenticated;
+revoke all on public.km_positions from anon, authenticated;
+revoke all on public.km_tag_requests from anon, authenticated;
