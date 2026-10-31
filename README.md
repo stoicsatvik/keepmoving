@@ -32,15 +32,15 @@ Mobile-first GPS manhunt with player-selected radius (100 m–100 km), time (5�
 - Hunter can request a tag when near a Shadow (server checks recent, reasonably accurate GPS); Shadow must approve within 60 seconds. Never physically chase someone into unsafe areas.
 - Hunters win when every Shadow is tagged; Shadows win if at least one remains after the timer.
 - If a player closes their browser, GPS stops updating; their location becomes stale. Keep the app open and foregrounded. Android/iOS browsers do not guarantee background tracking.
-- Coordinates remain on the server until removed. Do not use this for covert tracking.
+- Coordinates are removed on match completion. Schedule the cleanup script to remove abandoned games; never use this for covert tracking.
 
 ## Limits
 - Radius 100–100,000 m; duration 300–10,800 s; headstart 0–600 s; reveal 30–600 s; shrink interval 60–1,800 s; max 20 players/room.
-- Foreground location updates targeted every 10 sec; game state polls every 5 sec.
+- Foreground location updates targeted every 10 sec; game state polls every 10 sec.
 - This MVP uses direct client polling rather than Realtime subscriptions to keep installation simple.
 - No accounts, paid services, background GPS, geofenced street routing, or push notifications in v1.
-- **Privacy:** The MVP does not yet automatically delete expired game coordinates. Run a retention cleanup before opening it beyond a trusted test group.
+- **Privacy:** Exact GPS positions are deleted when a game finishes or the host ends it. Abandoned games still need a scheduled retention cleanup; use `scripts/retention-cleanup.sql` every day.
 
 ## Next before public launch
-- Scheduled purge of finished games and GPS coordinates, spam/rate limits, admin moderation, map tile provider compliant with actual traffic, server-side transactional game transitions, and stronger capture validation.
+- Schedule the included purge script for abandoned/old games; add spam/rate limits, admin moderation, map tile provider compliant with actual traffic, server-side transactional game transitions, and stronger capture validation.
 - Location is sensitive information. Get explicit consent from all players and set a safe play boundary.
