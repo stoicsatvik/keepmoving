@@ -288,12 +288,15 @@ const SCENES = [
 ];
 const TRAILER_SECONDS = 18;
 let trailerInterval = null;
+let trailerObserver = null;
 let trailerElapsed = 0;
 let lastFrame = 0;
 let paused = false;
 let sceneIndex = -1;
 
 export function stopLanding() {
+  if (trailerObserver) trailerObserver.disconnect();
+  trailerObserver = null;
   if (trailerInterval !== null) window.clearInterval(trailerInterval);
   trailerInterval = null;
   lastFrame = 0;
@@ -317,6 +320,9 @@ export function initLanding() {
   const play = root.querySelector("#lp-pause");
   const replay = root.querySelector("#lp-replay");
   const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let inView = false;
+  let beganPlaying = false;
+  stage.classList.add("lp-preview-paused");
 
   function update() {
     const scene = Math.min(SCENES.length-1, Math.floor(trailerElapsed / 4.5));
@@ -336,7 +342,7 @@ export function initLanding() {
   }
   function setPause(next) {
     paused=next;
-    stage.classList.toggle("lp-preview-paused",paused);
+    stage.classList.toggle("lp-preview-paused",paused || !inView);
     play.textContent=paused?"▶":"Ⅱ";
     play.setAttribute("aria-label",paused?"Play simulated gameplay preview":"Pause simulated gameplay preview");
     lastFrame=performance.now();
@@ -359,9 +365,33 @@ export function initLanding() {
   });
   update();
   if (reduced) { setPause(true);return; }
+  // Start the cinematic at the moment someone reaches it, rather than
+  // playing through the entire story while it is offscreen.
+  if ("IntersectionObserver" in window) {
+    trailerObserver = new IntersectionObserver((entries)=>{
+      inView = entries.some(entry=>entry.isIntersecting);
+      if (inView && !beganPlaying) {
+        beganPlaying = true;
+        trailerElapsed = 0;
+        sceneIndex = -1;
+        for (const element of stage.querySelectorAll(".lp-safe-zone,.lp-pin-hunter,.lp-pin-shadow")) {
+          element.style.animation = "none";
+          void element.offsetWidth;
+          element.style.animation = "";
+        }
+        update();
+      }
+      stage.classList.toggle("lp-preview-paused", paused || !inView);
+      lastFrame = performance.now();
+    }, {threshold:0.2});
+    trailerObserver.observe(stage);
+  } else {
+    inView = true;
+    stage.classList.remove("lp-preview-paused");
+  }
   lastFrame=performance.now();
   trailerInterval=window.setInterval(()=>{
-    if (paused || document.hidden) {lastFrame=performance.now();return;}
+    if (paused || !inView || document.hidden) {lastFrame=performance.now();return;}
     const now=performance.now();
     trailerElapsed += Math.min(0.25,(now-lastFrame)/1000);
     lastFrame=now;
