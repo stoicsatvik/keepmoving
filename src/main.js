@@ -3,6 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./style.css";
+import { renderLanding, initLanding, stopLanding } from "./landing.js";
+import "./landing.css";
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -36,53 +38,12 @@ async function request(action, extra={}) {
   return data;
 }
 function home() {
+  stopLanding();
   stopRoom();
-  app.innerHTML=`
-    <div class="landing">
-      <header class="brand"><span class="brand-icon">↗</span> KEEP<span>MOVING</span><span class="version">ALPHA</span></header>
-      <div class="hero">
-        <p class="eyebrow">REAL WORLD. REAL CHASE.</p>
-        <h1>THE CITY<br><em>IS YOUR ARENA.</em></h1>
-        <p class="lead">Create a GPS-powered manhunt. Set the radius, choose your team, and survive the shrinking zone.</p>
-      </div>
-      <div class="setup-grid">
-        <section class="panel">
-          <div class="panel-heading"><span class="step">01</span><h2>Create a hunt</h2></div>
-          <form id="create-form">
-            <label>Your name<input name="name" maxlength="24" required placeholder="Your player name" value="${esc(playerName)}"></label>
-            <div class="fields">
-              <label>Radius (metres)<input name="radius" type="number" min="100" max="100000" step="100" required value="1000"></label>
-              <label>Match (minutes)<input name="duration" type="number" min="5" max="180" step="1" required value="30"></label>
-              <label>Head start (minutes)<input name="headstart" type="number" min="0" max="10" step="1" required value="3"></label>
-              <label>Location reveal (seconds)<input name="reveal" type="number" min="30" max="600" step="30" required value="180"></label>
-              <label>Zone shrink (minutes)<input name="shrink" type="number" min="1" max="30" step="1" required value="10"></label>
-            </div>
-            <div class="tip"><span>◎</span> Starting zone is centered on your phone's GPS. Maximum radius 100 km; walking matches work best below 2 km.</div>
-            <button class="btn primary" type="submit">CREATE GAME <span>↗</span></button>
-          </form>
-        </section>
-        <section class="panel secondary-panel">
-          <div class="panel-heading"><span class="step">02</span><h2>Join friends</h2></div>
-          <form id="join-form">
-            <label>Your name<input name="name" maxlength="24" required placeholder="Your player name" value="${esc(playerName)}"></label>
-            <label>Six-character lobby code<input class="code-input" name="code" required minlength="6" maxlength="6" placeholder="XXXXXX" autocapitalize="characters" autocomplete="off"></label>
-            <button class="btn outlined" type="submit">JOIN GAME <span>→</span></button>
-          </form>
-          <div class="quick-rules"><h3>HOW IT WORKS</h3>
-            <p><b>01.</b> Shadows get a head start.</p>
-            <p><b>02.</b> Hunters see occasional GPS reveals.</p>
-            <p><b>03.</b> The safe zone keeps shrinking.</p>
-            <p><b>04.</b> Confirm tags to capture Shadows.</p>
-            <p><b>05.</b> Survive the clock to win.</p>
-          </div>
-        </section>
-      </div>
-      <p class="disclaimer">Play only in safe, permitted public areas. Never trespass or cross traffic to chase someone. Location sharing requires consent. Keep this browser open during the match.</p>
-      ${configured?"":'<div class="setup-warning">Setup required: configure Supabase credentials in <code>.env.local</code> and deploy the Edge Function (README).</div>'}
-    </div>
-    <div id="toast" class="toast" hidden></div>`;
+  app.innerHTML = renderLanding({ playerName, configured, esc });
   document.querySelector("#create-form").addEventListener("submit", createRoom);
   document.querySelector("#join-form").addEventListener("submit", joinRoom);
+  initLanding();
 }
 function rememberRoom(code,name,token) {
   roomCode=code;playerName=name;sessionToken=token;
@@ -176,7 +137,7 @@ function shell(){
   };
 }
 async function startRoom(){
-  stopRoom();shell();
+  stopLanding();stopRoom();shell();
   try{
     await refresh();startGps();pollTimer=setInterval(refresh,10000);clockTimer=setInterval(updateClock,1000);
   }catch(e){status(e.message,"error");throw e}
