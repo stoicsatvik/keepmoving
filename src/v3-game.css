@@ -1,0 +1,50 @@
+/* KeepMoving Field File / same colors, typography and edges in play mode */
+.game-root {
+ --hud-accent:#C7FF4D;
+ --hud-ink:#0B0D10;
+ background:#0B0D10;
+ color:#F1EEE8;
+ font-family:"Space Grotesk",Arial,sans-serif;
+}
+.game-root[data-role="hunter"]{--hud-accent:#FF3B4F;--hud-ink:#0B0D10}
+.game-root[data-role="shadow"]{--hud-accent:#C7FF4D;--hud-ink:#0B0D10}
+.game-root .game-header{border-bottom:1px solid #444E50;padding:8px 6px 20px}
+.game-root .brand{font:900 25px "Barlow Condensed",Impact,sans-serif;letter-spacing:.02em}
+.game-root .brand span:not(.brand-icon){color:var(--hud-accent)}
+.game-root .brand-icon{border:2px solid #F1EEE8;background:transparent;color:var(--hud-accent);border-radius:0;font-size:24px}
+.game-root .role-status{background:var(--hud-accent);color:var(--hud-ink);font:700 11px "IBM Plex Mono",monospace;letter-spacing:.03em;padding:12px 17px}
+.game-root .room-head{background:#15191D;border-radius:0;border-color:#444E50}
+.game-root .room-head b{color:#F1EEE8;font-family:"IBM Plex Mono",monospace}
+.game-root .small-action{border-radius:0;background:#15191D;border-color:#505A5B;font:600 11px "IBM Plex Mono",monospace}
+.game-root .small-action:hover{border-color:var(--hud-accent)}
+.game-root .map-card{border-radius:0;border-color:#535F60}
+.game-root .map-top .chip{border-radius:0;background:#0E1518E8;border-color:#526064;color:#F1EEE8;font:600 10px "IBM Plex Mono",monospace}
+.game-root .map-top .chip:first-child{border-left:3px solid var(--hud-accent)}
+.game-root .map-top .chip:nth-child(2){border-left:3px solid #F5B342}
+.game-root #gps-chip{border-radius:0;background:#0B1318EC;border-color:#526064;color:var(--hud-accent);font:600 10px "IBM Plex Mono",monospace}
+.game-root .zone-warning{border-radius:0;background:#412A17F2;border-color:#F5B342;color:#FFDEA4}
+.game-root .sidebar .panel{background:#15191D;border:1px solid #444E50;border-radius:0}
+.game-root .kicker,.game-root .side-title{color:var(--hud-accent);font:700 11px "IBM Plex Mono",monospace}
+.game-root .clock{font:800 clamp(76px,7vw,110px)/.88 "Barlow Condensed",Impact,sans-serif;letter-spacing:.005em;margin:17px 0}
+.game-root .stats-row span,.game-root .stats-row strong,.game-root .player-meta small,.game-root .lobby-note{font-family:"IBM Plex Mono",monospace}
+.game-root .stats-row strong{color:#F1EEE8}
+.game-root .winner{border-radius:0;background:#203126;border-color:var(--hud-accent);color:var(--hud-accent)}
+.game-root .side-title span,.game-root .you{color:var(--hud-accent)}
+.game-root .player-avatar{border-radius:0}
+.game-root .player-avatar.hunter{background:#3D1A22;color:#FF3B4F}
+.game-root .player-avatar.shadow{background:#29371B;color:#C7FF4D}
+.game-root .btn{border-radius:0;font-family:"IBM Plex Mono",monospace}
+.game-root .btn.primary{background:var(--hud-accent);color:var(--hud-ink);border-color:var(--hud-accent)}
+.game-root .btn.outlined{color:#F1EEE8;border-color:#687675}
+.game-root .role-toggle{border-radius:0;border-color:#505F5C;background:#1C2226}
+.game-root input,.game-root select{border-radius:0;background:#0B1216;border-color:#53605D;color:#F1EEE8}
+.game-root input:focus,.game-root select:focus{border-color:var(--hud-accent)}
+.game-root .self-pin{background:var(--hud-accent);border:4px solid #F1EEE8;box-shadow:0 0 0 8px color-mix(in srgb,var(--hud-accent) 24%,transparent),0 3px 12px #0008}
+.game-root .shadow-pin{background:#C7FF4D;color:#142217;border-color:#F1EEE8;box-shadow:0 0 0 8px #C7FF4D24,0 3px 12px #0008}
+.game-root .rules-small a{color:var(--hud-accent);text-decoration:underline;text-underline-offset:3px}
+.game-root a:focus-visible,.game-root button:focus-visible{outline:2px solid var(--hud-accent);outline-offset:3px}
+@media(max-width:560px){
+ .game-root .game-header{flex-wrap:wrap}
+ .game-root .role-status{order:3;width:100%;text-align:center;padding:10px}
+ .game-root .clock{font-size:82px}
+}
