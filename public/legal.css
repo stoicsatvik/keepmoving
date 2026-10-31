@@ -1,0 +1,17 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;1,800&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap");
+:root{--bg:#0B0D10;--panel:#15191D;--fg:#F1EEE8;--red:#FF3B4F;--green:#C7FF4D;--muted:#AEB8B3;--line:#4B5756}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:400 16px/1.75 "Space Grotesk",sans-serif}
+header{border-bottom:1px solid var(--line);padding:23px max(24px,calc((100vw - 920px)/2))}
+header a{color:var(--fg);text-decoration:none;font:800 24px "Barlow Condensed",sans-serif;letter-spacing:.04em}
+header a span{color:var(--red)}
+main{max-width:920px;margin:0 auto;padding:70px 24px 100px}
+.eyebrow{font:500 12px "IBM Plex Mono",monospace;letter-spacing:.07em;color:var(--green);margin:0 0 22px}
+h1{font:italic 800 clamp(67px,11vw,115px)/.88 "Barlow Condensed",Impact,sans-serif;text-transform:uppercase;margin:0 0 36px}
+h2{font:800 38px/1.07 "Barlow Condensed",Impact,sans-serif;text-transform:uppercase;margin:44px 0 12px}
+p,li{color:#C9D0CD}ul{padding-left:22px}
+li+li{margin-top:8px}
+a{color:var(--green);text-underline-offset:4px}
+.meta{border-top:1px solid var(--line);padding-top:19px;margin-bottom:42px;color:#A8B8B1;font:500 12px "IBM Plex Mono",monospace}
+.note{background:#152026;border-left:3px solid var(--red);padding:17px 20px;color:var(--fg)}
+footer{border-top:1px solid var(--line);max-width:920px;margin:auto;padding:28px 24px 60px;font:500 11px "IBM Plex Mono",monospace;display:flex;gap:22px;flex-wrap:wrap}
+@media(max-width:600px){main{padding-top:46px}h1{font-size:72px}h2{font-size:31px}}
