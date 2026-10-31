@@ -1,10 +1,10 @@
 
 .game-root{
- --hud-accent:#b9f47d;--hud-bg:#111517;--hud-ink:#090d10;
+ --hud-accent:#9DCDC0;--hud-bg:#111517;--hud-ink:#090d10;
  background:#0a0d0e;color:#eeeae3;font-family:"DM Sans",sans-serif;
 }
-.game-root[data-role="hunter"]{--hud-accent:#ff5757;--hud-ink:#180809}
-.game-root[data-role="shadow"]{--hud-accent:#b9f47d;--hud-ink:#0f160b}
+.game-root[data-role="hunter"]{--hud-accent:#E7A98F;--hud-ink:#180809}
+.game-root[data-role="shadow"]{--hud-accent:#9DCDC0;--hud-ink:#0f160b}
 .game-root .game-header{border-bottom:1px solid #343c3d;padding-bottom:20px}
 .game-root .brand{font-family:"Barlow Condensed",Impact,sans-serif;font-size:23px;font-weight:900;letter-spacing:-.4px}
 .game-root .brand span:not(.brand-icon):not(.version){color:var(--hud-accent)}
@@ -27,8 +27,8 @@
 .game-root .winner{border-radius:0;background:#1d2a24;color:var(--hud-accent);border-color:var(--hud-accent)}
 .game-root .side-title span,.game-root .you{color:var(--hud-accent)}
 .game-root .player-avatar{border-radius:0}
-.game-root .player-avatar.hunter{background:#3b181a;color:#ff5757}
-.game-root .player-avatar.shadow{background:#243320;color:#b9f47d}
+.game-root .player-avatar.hunter{background:#3F2D38;color:#E7A98F}
+.game-root .player-avatar.shadow{background:#254244;color:#9DCDC0}
 .game-root .btn{border-radius:0;font-family:"IBM Plex Mono",monospace}
 .game-root .btn.primary{background:var(--hud-accent);color:var(--hud-ink);border-color:var(--hud-accent)}
 .game-root .btn.outlined{border-color:#71837d;color:#eeeae3}
@@ -36,5 +36,5 @@
 .game-root input,.game-root select{background:#090e10;border-radius:0;color:#edece6;border-color:#4c5652}
 .game-root input:focus,.game-root select:focus{border-color:var(--hud-accent)}
 .game-root .self-pin{background:var(--hud-accent);border:4px solid #fafbf8;box-shadow:0 0 0 8px color-mix(in srgb,var(--hud-accent) 21%,transparent),0 3px 12px #000a}
-.game-root .shadow-pin{background:#b9f47d;color:#15210f;border-color:#f6f9ef;box-shadow:0 0 0 8px #b9f47d33,0 2px 12px #0008}
+.game-root .shadow-pin{background:#9DCDC0;color:#15210f;border-color:#f6f9ef;box-shadow:0 0 0 8px #9DCDC033,0 2px 12px #0008}
 @media(max-width:560px){.game-root .game-header{flex-wrap:wrap}.game-root .role-status{order:3;width:100%;text-align:center;padding:9px}.game-root .clock{font-size:76px}}
