@@ -1,6 +1,10 @@
 
 import { createClient } from "@supabase/supabase-js";
-import maplibregl from "maplibre-gl";
+// Load the WebGL map engine only when someone enters a real game.
+let maplibregl = null;
+async function loadMapEngine() {
+  if (!maplibregl) maplibregl = (await import("maplibre-gl")).default;
+}
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./style.css";
 import { renderLanding, initLanding, stopLanding } from "./landing.js";
@@ -141,6 +145,7 @@ function shell(){
 async function startRoom(){
   stopLanding();stopRoom();shell();
   try{
+    await loadMapEngine();
     await refresh();startGps();pollTimer=setInterval(refresh,10000);clockTimer=setInterval(updateClock,1000);
   }catch(e){status(e.message,"error");throw e}
 }
