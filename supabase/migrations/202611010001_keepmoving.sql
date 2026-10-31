@@ -23,6 +23,7 @@ create table if not exists public.km_players (
   id uuid primary key default gen_random_uuid(),
   game_id uuid not null references public.km_games(id) on delete cascade,
   user_id uuid not null,
+  session_hash text not null unique,
   name text not null check (char_length(name) between 1 and 24),
   role text not null check (role in ('hunter','shadow')),
   captured_at timestamptz,
