@@ -1,2 +1,2 @@
-[functions.game]
-verify_jwt = true
+[functions.keepmoving-game]
+verify_jwt = false # Per-room 256-bit guest token auth is checked inside the function
