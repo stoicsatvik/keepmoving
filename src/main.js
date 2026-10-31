@@ -10,6 +10,7 @@ const configured = !!(url && key);
 const supabase = configured ? createClient(url, key) : null;
 const app = document.getElementById("app");
 let roomCode = localStorage.getItem("km-room") || "";
+let sessionToken = localStorage.getItem("km-session") || "";
 let playerName = localStorage.getItem("km-name") || "";
 let gps = null, lastLocationSent = 0, lastLocationMessage = "";
 let currentState = null, lastStateTime = 0;
@@ -25,7 +26,7 @@ const status = (msg,type="info") => {
 };
 async function request(action, extra={}) {
   if(!configured) throw new Error("Add Supabase environment variables before playing.");
-  const {data,error}=await supabase.functions.invoke("keepmoving-game", {body:{action,code:roomCode,...extra}});
+  const {data,error}=await supabase.functions.invoke("keepmoving-game", {body:{action,code:roomCode,session_token:sessionToken,...extra}});
   if(error){
     let message=error.message || "Request failed";
     try { const body=await error.context?.json();if(body?.error)message=body.error; }catch{}
@@ -33,12 +34,6 @@ async function request(action, extra={}) {
   }
   if(data?.error) throw new Error(data.error);
   return data;
-}
-async function auth() {
-  if(!configured) throw new Error("Supabase isn't configured yet. See README.");
-  const {data:{session}}=await supabase.auth.getSession();if(session)return;
-  const {error}=await supabase.auth.signInAnonymously();
-  if(error)throw new Error("Anonymous sign-in failed: "+error.message);
 }
 function home() {
   stopRoom();
@@ -89,9 +84,10 @@ function home() {
   document.querySelector("#create-form").addEventListener("submit", createRoom);
   document.querySelector("#join-form").addEventListener("submit", joinRoom);
 }
-function rememberRoom(code,name) {
-  roomCode=code;playerName=name;
+function rememberRoom(code,name,token) {
+  roomCode=code;playerName=name;sessionToken=token;
   localStorage.setItem("km-room",code);localStorage.setItem("km-name",name);
+  localStorage.setItem("km-session",token);
 }
 async function geolocate() {
   if(!navigator.geolocation)throw new Error("This browser does not support location.");
@@ -113,13 +109,13 @@ async function createRoom(event) {
   if(radius>5000&&!confirm("A zone larger than 5 km may be unsafe or impractical on foot. Continue?"))return;
   busy=true;const btn=event.submitter;btn.disabled=true;
   try{
-    await auth();status("Requesting precise GPS to center the game...");
+    status("Requesting precise GPS to center the game...");
     const pos=await geolocate();
     const result=await request("create",{
       name,radius_m:radius,duration_s:duration*60,headstart_s:headstart*60,
       reveal_s:reveal,shrink_s:shrink*60,lat:pos.lat,lng:pos.lng,
     });
-    rememberRoom(result.code,name);await startRoom();
+    rememberRoom(result.code,name,result.token);await startRoom();
   }catch(e){status(e.message,"error")}
   finally{busy=false;btn.disabled=false}
 }
@@ -129,7 +125,7 @@ async function joinRoom(event) {
   const code=String(f.get("code")||"").trim().toUpperCase();
   if(!/^[A-Z2-9]{6}$/.test(code)){status("Enter a valid six-character code","error");return}
   busy=true;const btn=event.submitter;btn.disabled=true;
-  try{await auth();const result=await request("join",{code,name});rememberRoom(result.code,name);await startRoom()}
+  try{const result=await request("join",{code,name});rememberRoom(result.code,name,result.token);await startRoom()}
   catch(e){status(e.message,"error")}
   finally{busy=false;btn.disabled=false}
 }
@@ -140,7 +136,10 @@ function stopRoom(){
   if(gpsWatch!==null && navigator.geolocation)navigator.geolocation.clearWatch(gpsWatch);gpsWatch=null;
   if(map){map.remove();map=null}selfMarker=null;revealMarkers=[];currentState=null;
 }
-function leaveRoom(){roomCode="";localStorage.removeItem("km-room");home()}
+function leaveRoom(){
+  roomCode="";sessionToken="";
+  localStorage.removeItem("km-room");localStorage.removeItem("km-session");home();
+}
 function shell(){
   app.innerHTML=`
   <div class="game-root">
@@ -344,6 +343,6 @@ function drawMap(){
   }
 }
 home();
-if(roomCode&&configured){
-  auth().then(startRoom).catch(()=>{roomCode="";localStorage.removeItem("km-room");home()});
+if(roomCode&&sessionToken&&configured){
+  startRoom().catch(()=>{roomCode="";sessionToken="";localStorage.removeItem("km-room");localStorage.removeItem("km-session");home()});
 }
