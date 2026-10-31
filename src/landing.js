@@ -206,7 +206,7 @@ return `
       ${configured ? "" : '<div class="lp-config-warning">Connect Supabase to enable multiplayer rooms.</div>'}
     </section>
   </main>
-  <footer class="lp-footer"><div class="lp-footer-logo">keepmoving<span>✳</span></div><p>There’s a whole world outside.</p><span>© 2026 KeepMoving · Go make a story.</span></footer>
+  <footer class="lp-footer"><div class="lp-footer-logo">keepmoving<span>✳</span></div><p>There’s a whole world outside.</p><span>© 2026 KeepMoving · <a href="https://unsplash.com/photos/city-street-at-night-with-wet-pavement-and-lights-8KJCgpIYptY/" target="_blank" rel="noopener noreferrer">Hero photo: Robert / Unsplash</a></span></footer>
 </div><div id="toast" class="toast" hidden></div>`;
 }
 
