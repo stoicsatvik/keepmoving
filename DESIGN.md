@@ -1,56 +1,48 @@
-# KeepMoving · Storybook Visual Direction
+# KeepMoving: The City Becomes the Game
 
-## The premise
+## Hero concept
 
-**One message. A group of friends. A familiar city becomes an adventure.**
+The first fold is a cinematic piece of fictional "found footage." It combines real licensed night-city photography with **actual responsive HTML and SVG artifacts**: a chat excerpt, shrinking-zone mini-map, player position markers, match stats, and taped photo evidence. The result should feel like the beginning of a story your own friends might make.
 
-KeepMoving should feel like an invitation to make memories with friends, rather than a horror poster, tactical military interface, or a neon SaaS dashboard.
+The fake round is consistently labeled **SIMULATED MATCH** or **FICTIONAL ROUND**. No real player names, GPS coordinates, private location history, or live session data are placed on the public landing page.
 
-### Visual language
+### Visual tokens
 
-- **Evening over alarm:** warm twilight, quiet streetlights, layered blue hills, and an illustrated city as the opening scene.
-- **Literary editorial typography:** [Fraunces](https://fonts.google.com/specimen/Fraunces) for story headlines, [Manrope](https://fonts.google.com/specimen/Manrope) for body and buttons, [DM Mono](https://fonts.google.com/specimen/DM+Mono) for subtle chapter labels and functional GPS telemetry.
-- **Open, human copy:** narrative sentences rather than threatening all-caps headlines.
-- **Actual gameplay remains legible:** the playful marketing site gives way to a precise, phone-readable game HUD.
-
-### Color semantics
-
-| Token | Color | Purpose |
+| Name | Value | Role |
 | --- | --- | --- |
-| Midnight | `#15233D` | Twilight hero, map/game base |
-| Cream | `#F6F2EB` | Light story chapters, lettering |
-| Peach | `#F6C2A5` | Invitation CTA, warmth, seeker visual |
-| Sea glass | `#9BCDC6` | Hider / mystery |
-| Lilac | `#9A819E` | Editorial emphasis |
-| Golden hour | `#E4CF99` | Shrinking zone, warnings |
+| Asphalt | #090D10 | Base, film-like darkness |
+| Chalk | #F5F4ED | Headline and copy |
+| Pursuit red | #FF344E | Hunter / kinetic CTA |
+| Signal green | #C7FF55 | Shadow / received GPS |
+| Closing amber | #F6B947 | Shrinking-zone circle |
+| Cold cyan | #61D6DE | Secondary visual signal |
 
-A user's role uses color **plus text and a distinct icon**: Hunters/Seekers remain warm apricot, Shadows/Hiders remain cool sea-glass. The real game backend still uses `hunter`/`shadow`.
+- Headlines: **Barlow Condensed** italic 900; story text: **Space Grotesk**; small field labels: **IBM Plex Mono**.
+- Film-noir atmosphere: contrast, photographic light, minimal animated noise.
+- No generic SaaS card wall, glass gradients, pointless slow floating, or fake corporate marketing.
+- Group-chat card, mini-map and stats are responsive functional DOM components, not a flattened image.
+- Internal role names in the backend stay `hunter` and `shadow`; the UI can use casual descriptions.
 
-### Chapters and interaction
+### Photographic sources and licensing
 
-1. **Prologue:** dusk-city SVG, personal story, group-chat bubble, gentle CTA.
-2. **The invitation:** warm-paper editorial story, stylized neighborhood evening illustration.
-3. **The chase:** 18-second simulated gameplay cinematic with pause/replay and explicit non-real-GPS disclosure.
-4. **The rules:** three approachable steps grounded in game mechanics.
-5. **Two sides:** interactive role-color perspectives; no change to actual role assignment.
-6. **The next chapter:** working existing Create/Join flows with the same form names.
+The hero uses an Unsplash-licensed night-city photo by **Robert | Visual Diary**:
+https://unsplash.com/photos/city-street-at-night-with-wet-pavement-and-lights-8KJCgpIYptY/
 
-The illustrated skyline and replay are **original HTML/CSS/SVG**, not an externally hosted video or an actual gameplay recording. The page labels the replay as a simulation.
+The supporting snapshot uses an Unsplash-licensed night-city photo by **MChe Lee**:
+https://unsplash.com/photos/people-walk-on-wet-street-with-neon-lights-at-night-uxfUg7RNees
 
-### Non-negotiables
+The downloaded rendition is loaded from verified Unsplash CDN IDs. They are **atmospheric stock photos**, not claims to show a particular match or location. Visual UI cards are original custom HTML/SVG.
 
-- Keep the game engine, Supabase guest-session flow, and Vite/GitHub Pages base path working.
-- Prioritize mobile performance; MapLibre is lazy-loaded only when entering an actual room.
-- Respect `prefers-reduced-motion`, keyboard interaction, and readable contrast.
-- No precise player GPS data in the public preview.
-- Keep play confined to a safe agreed public area; never promote trespassing or risky road chases.
-- If later adding a filmed 15–20s trailer, use muted `playsinline`, low bandwidth formats, a good poster, and pause when not visible.
+### Game architecture unchanged
 
-### Potential open-source enhancement tools
+- GitHub Pages hosts Vite static frontend.
+- Supabase CampusConnect instance with separate `km_` tables and `keepmoving-game` function.
+- Guest sessions, GPS reveal controls, server-owned game state, tag verification and map remain.
+- MapLibre is lazy-loaded only once the player enters a match.
+- User-controlled permissions, foreground-location limits, consent and retention remain important.
 
-- [MapLibre](https://maplibre.org/maplibre-gl-js/) for live GPS map (already in app).
-- [Motion](https://motion.dev/) for optional refined text/scroll animation.
-- [Three.js](https://threejs.org/) for future atmospheric web visual experiments, not needed for MVP.
-- [Lucide](https://lucide.dev/) for functional HUD icons if necessary.
+### After initial launch
 
-Avoid heavy extra dependencies purely for decorative motion. A working, delightful product is the goal.
+- Replace fictional visuals with **consented, privacy-safe actual gameplay footage**.
+- Add opt-in session summaries and distance totals using accuracy-filtered traces.
+- Build genuine team play tests before wider release.
