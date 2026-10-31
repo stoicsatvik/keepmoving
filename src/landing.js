@@ -1,3 +1,4 @@
+import { renderUrbanHero } from "./urban-hero.js";
 
 const createRules = (playerName, esc) => `
   <form id="create-form" class="lp-form">
@@ -44,58 +45,6 @@ const joinRules = (playerName, esc) => `
     <p class="lp-input-note">Ask a friend for their room code. Location sharing is only for the game.</p>
   </form>`;
 
-function renderCityArt(){
-return `
-  <svg class="lp-hero-city" viewBox="0 0 1500 970" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <defs>
-      <linearGradient id="twilight" x1="0" y1="0" x2="0.72" y2="1">
-        <stop offset="0" stop-color="#152441"/>
-        <stop offset=".48" stop-color="#353F65"/>
-        <stop offset="1" stop-color="#D6A59A"/>
-      </linearGradient>
-      <radialGradient id="moon-glow"><stop offset="0" stop-color="#FFDCBA" stop-opacity=".45"/><stop offset=".46" stop-color="#E7B8AB" stop-opacity=".13"/><stop offset="1" stop-color="#E7B8AB" stop-opacity="0"/></radialGradient>
-      <linearGradient id="haze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#64769C" stop-opacity="0"/><stop offset="1" stop-color="#E0A6A0" stop-opacity=".43"/></linearGradient>
-      <linearGradient id="foreground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1C3046"/><stop offset="1" stop-color="#0C1725"/></linearGradient>
-      <filter id="blur-moon"><feGaussianBlur stdDeviation="30"/></filter>
-    </defs>
-    <rect width="1500" height="970" fill="url(#twilight)"/>
-    <circle cx="1130" cy="260" r="270" fill="url(#moon-glow)" filter="url(#blur-moon)"/>
-    <circle cx="1120" cy="253" r="76" fill="#FFDFC2" opacity=".93"/>
-    <circle cx="1144" cy="245" r="76" fill="#FFE9D0" opacity=".3"/>
-    <g fill="#F5E6D8" opacity=".67">
-      <circle cx="244" cy="140" r="2"/><circle cx="421" cy="281" r="1.6"/><circle cx="727" cy="111" r="1.4"/><circle cx="976" cy="192" r="1.8"/><circle cx="1342" cy="117" r="1.5"/>
-      <circle cx="1284" cy="350" r="1.4"/><circle cx="692" cy="294" r="1.3"/><circle cx="102" cy="343" r="1.6"/><circle cx="514" cy="122" r="1.6"/>
-    </g>
-    <path d="M0 510Q250 447 480 514T1000 470T1500 518V970H0Z" fill="#6A6D84" opacity=".25"/>
-    <path d="M0 555Q430 505 710 557T1500 531V970H0Z" fill="url(#haze)" opacity=".66"/>
-    <g fill="#32455E">
-      <path d="M0 584h100v-116h58v116h59v-188h94v188h55v-137h97v137h56v-217h109v217h73v-145h64v145h47v-176h84v176h84v-119h57v119h49v-217h103v217h66v-139h65v139h50v-184h107v184h81v-113h113v113h34V970H0Z"/>
-    </g>
-    <g fill="#1D3046">
-      <path d="M0 687h109v-139h88v139h59v-95h105v95h54v-187h100v187h65v-118h113v118h84v-158h95v158h92v-104h104v104h62v-179h106v179h65v-132h92v132h90v-179h98v179h68V970H0Z"/>
-    </g>
-    <g fill="#F4C9A2" opacity=".76">
-      <rect x="136" y="590" width="9" height="14"/><rect x="165" y="627" width="9" height="14"/><rect x="271" y="620" width="10" height="15"/><rect x="301" y="620" width="10" height="15"/>
-      <rect x="432" y="580" width="10" height="15"/><rect x="472" y="635" width="10" height="15"/><rect x="612" y="603" width="9" height="13"/><rect x="747" y="570" width="9" height="15"/>
-      <rect x="780" y="600" width="9" height="15"/><rect x="958" y="626" width="8" height="14"/><rect x="1030" y="614" width="9" height="13"/><rect x="1247" y="575" width="10" height="13"/>
-      <rect x="1380" y="600" width="10" height="15"/><rect x="1440" y="550" width="10" height="15"/>
-    </g>
-    <g fill="#9CABC3" opacity=".48">
-      <rect x="284" y="572" width="10" height="15"/><rect x="326" y="659" width="10" height="15"/><rect x="801" y="565" width="9" height="13"/><rect x="1160" y="598" width="9" height="13"/>
-    </g>
-    <path d="M0 705C258 635 473 702 648 708S1130 639 1500 710V970H0Z" fill="url(#foreground)"/>
-    <path d="M0 810Q418 704 785 792T1500 767V970H0Z" fill="#152436" opacity=".88"/>
-    <path d="M-100 904Q380 734 900 834T1600 840" stroke="#7B8BA4" stroke-width="9" fill="none" opacity=".36"/>
-    <path d="M-100 904Q380 734 900 834T1600 840" stroke="#FFD8AB" stroke-width="1.5" fill="none" opacity=".3" stroke-dasharray="4 30"/>
-    <g fill="#121E2C">
-      <path d="M0 850h100l34-112 32 112h170l35-93 27 93h190l38-136 32 136h220l52-98 38 98h220l34-103 42 103h200v120H0Z"/>
-    </g>
-    <g fill="#F1D2A9" opacity=".8">
-      <circle cx="216" cy="818" r="3.5"/><circle cx="497" cy="823" r="2.5"/><circle cx="868" cy="829" r="3"/><circle cx="1298" cy="815" r="3.2"/>
-    </g>
-  </svg>
-`; }
-
 export function renderLanding({playerName,configured,esc}){
 return `
 <div class="lp landing lp-story" id="top" data-preview-role="hunter">
@@ -112,26 +61,7 @@ return `
     </nav>
   </header>
   <main>
-    <section class="lp-hero" aria-labelledby="lp-hero-title">
-      <div class="lp-hero-art">${renderCityArt()}</div>
-      <div class="lp-hero-wash" aria-hidden="true"></div>
-      <div class="lp-hero-inner">
-        <p class="lp-eyebrow"><span class="lp-spark">✳</span> The outside is calling <span class="lp-eyebrow-line"></span> A real-world game</p>
-        <div class="lp-hero-chapter">Friday, 7:42 pm <span aria-hidden="true">/</span> A story begins</div>
-        <h1 id="lp-hero-title">The night<br/>is <em>yours.</em></h1>
-        <p class="lp-hero-lead">One message. A group of friends.<br/>And suddenly, the city feels completely different.</p>
-        <div class="lp-hero-links">
-          <a href="#lobby" class="lp-big-cta">Write your own story <span aria-hidden="true">↗</span></a>
-          <a href="#preview" class="lp-link-quiet"><span class="lp-play-disc">▶</span> See how a night unfolds</a>
-        </div>
-      </div>
-      <div class="lp-hero-bubble" aria-label="A message from a friend">
-        <span class="lp-bubble-sender"><span class="lp-avatar-circle">S</span> THE GROUP CHAT <span class="lp-bubble-time">7:42 PM</span></span>
-        <p>“Bet you can't find me.”</p>
-        <span class="lp-bubble-reaction">6 friends saw this <span>✦</span></span>
-      </div>
-      <div class="lp-scroll-prompt"><span>Scroll to enter the story</span><span aria-hidden="true">↓</span></div>
-    </section>
+    ${renderUrbanHero()}
 
     <section class="lp-story-section" id="story" aria-labelledby="lp-story-title">
       <div class="lp-story-label">Chapter one <span> / </span> The invitation</div>
