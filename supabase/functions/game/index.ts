@@ -74,15 +74,22 @@ function randomCode() {
   return Array.from(bytes, b => alphabet[b % alphabet.length]).join("");
 }
 
+function randomToken() {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return Array.from(bytes, b=>b.toString(16).padStart(2,"0")).join("");
+}
+async function tokenHash(token: string) {
+  const encoded = new TextEncoder().encode(token);
+  const hash = await crypto.subtle.digest("SHA-256", encoded);
+  return Array.from(new Uint8Array(hash), b=>b.toString(16).padStart(2,"0")).join("");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
   try {
-    const bearer = req.headers.get("Authorization") || "";
-    if (!bearer.startsWith("Bearer ")) bad("Sign in required", 401);
-    const { data: { user }, error: authErr } = await admin.auth.getUser(bearer.slice(7));
-    if (authErr || !user) bad("Invalid session", 401);
-
+    // This API authenticates players with random per-room guest tokens.
+    // Supabase service-role credentials stay server-side; all public table access is revoked.
     const payload = await req.json();
     const action = String(payload.action || "");
     if (action === "create") {
@@ -96,10 +103,13 @@ serve(async (req) => {
       if (headstart_s >= duration_s) bad("Head start must be shorter than the match");
       const center_lat = coordinate(payload.lat, -90, 90, "latitude");
       const center_lng = coordinate(payload.lng, -180, 180, "longitude");
+      const userId = crypto.randomUUID();
+      const token = randomToken();
+      const session_hash = await tokenHash(token);
       let game: RecordAny | null = null;
       for (let i=0;i<4;i++) {
         const result = await admin.from("km_games").insert({
-          code: randomCode(), host_user_id: user.id,
+          code: randomCode(), host_user_id: userId,
           center_lat, center_lng, radius_m, duration_s, headstart_s, reveal_s, shrink_s,
         }).select().single();
         if (!result.error) { game = result.data; break; }
@@ -107,9 +117,9 @@ serve(async (req) => {
       }
       if (!game) bad("Could not create a unique room", 500);
       queryError(await admin.from("km_players").insert({
-        game_id: game.id, user_id: user.id, name, role: "hunter",
+        game_id: game.id, user_id: userId, session_hash, name, role: "hunter",
       }));
-      return json({ code: game.code });
+      return json({ code: game.code, token });
     }
 
     const code = String(payload.code || "").trim().toUpperCase();
@@ -120,18 +130,26 @@ serve(async (req) => {
     if (action === "join") {
       const name = String(payload.name || "").trim().slice(0,24);
       if (!name) bad("Enter your name");
-      const existing = queryError(await admin.from("km_players").select("id").eq("game_id",game.id).eq("user_id",user.id).maybeSingle());
-      if (existing) return json({ code });
+      const previous = String(payload.session_token || "");
+      if (/^[0-9a-f]{64}$/.test(previous)) {
+        const previousHash = await tokenHash(previous);
+        const existing = queryError(await admin.from("km_players").select("id").eq("game_id",game.id).eq("session_hash",previousHash).maybeSingle());
+        if (existing) return json({ code, token:previous });
+      }
       if (game.status !== "waiting") bad("Game already started");
       const roster = queryError(await admin.from("km_players").select("id").eq("game_id",game.id));
       if (roster.length >= MAX_PLAYERS) bad("Room is full (20 players)");
-      queryError(await admin.from("km_players").insert({ game_id: game.id, user_id: user.id, name, role:"shadow" }));
-      return json({ code });
+      const token = randomToken(), session_hash = await tokenHash(token);
+      queryError(await admin.from("km_players").insert({ game_id: game.id, user_id:crypto.randomUUID(), session_hash, name, role:"shadow" }));
+      return json({ code, token });
     }
 
-    const me = queryError(await admin.from("km_players").select("*").eq("game_id",game.id).eq("user_id",user.id).maybeSingle());
-    if (!me) bad("Join the lobby first", 403);
-    const isHost = game.host_user_id === user.id;
+    const token = String(payload.session_token || "");
+    if (!/^[0-9a-f]{64}$/.test(token)) bad("Missing or invalid player session", 401);
+    const session_hash = await tokenHash(token);
+    const me = queryError(await admin.from("km_players").select("*").eq("game_id",game.id).eq("session_hash",session_hash).maybeSingle());
+    if (!me) bad("This player session is not in the room", 403);
+    const isHost = game.host_user_id === me.user_id;
 
     if (action === "assign") {
       if (!isHost || game.status !== "waiting") bad("Only the host may assign roles before the match", 403);
