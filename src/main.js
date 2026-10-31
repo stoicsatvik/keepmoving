@@ -5,6 +5,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./style.css";
 import { renderLanding, initLanding, stopLanding } from "./landing.js";
 import "./landing.css";
+import "./game-theme.css";
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -103,8 +104,9 @@ function leaveRoom(){
 }
 function shell(){
   app.innerHTML=`
-  <div class="game-root">
+  <div class="game-root" data-role="hunter">
     <header class="game-header"><div class="brand"><span class="brand-icon">↗</span> KEEP<span>MOVING</span></div>
+      <div id="role-status" class="role-status" aria-label="Your game role">STANDBY</div>
       <div class="room-head"><span class="muted">ROOM</span> <b>${esc(roomCode)}</b> <button id="copy-code" class="small-action">COPY</button></div>
       <button id="leave" class="small-action">EXIT</button>
     </header>
@@ -185,6 +187,8 @@ function updateClock(){
 function updateRoom(){
   if(!currentState)return;
   const {game,me,players,is_host,tags}=currentState;
+  document.querySelector(".game-root").dataset.role = me.role;
+  document.querySelector("#role-status").textContent = me.role==="hunter"?"⌖ HUNTER":"◆ SHADOW";
   document.querySelector("#phase").textContent=game.status.toUpperCase();
   document.querySelector("#game-status").textContent=game.status==="headstart"?"SHADOWS HIDING":game.status==="hunt"?"HUNT LIVE":game.status.toUpperCase();
   document.querySelector("#zone-size").textContent="◎ "+meters(game.zone_radius_m);
@@ -261,8 +265,8 @@ function initMap(){
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),"bottom-right");
   map.on("load",()=>{
     map.addSource("zone",{type:"geojson",data:circleGeoJSON(g.center_lat,g.center_lng,g.zone_radius_m)});
-    map.addLayer({id:"zone-fill",type:"fill",source:"zone",paint:{"fill-color":"#3bf1ae","fill-opacity":0.10}});
-    map.addLayer({id:"zone-line",type:"line",source:"zone",paint:{"line-color":"#3bf1ae","line-width":2.5,"line-dasharray":[4,2]}});
+    map.addLayer({id:"zone-fill",type:"fill",source:"zone",paint:{"fill-color":"#e9b969","fill-opacity":0.085}});
+    map.addLayer({id:"zone-line",type:"line",source:"zone",paint:{"line-color":"#e9b969","line-width":2.5,"line-dasharray":[4,2]}});
     const outline=circleGeoJSON(g.center_lat,g.center_lng,g.radius_m).features[0].geometry.coordinates[0];
     const bounds=outline.reduce((b,p)=>b.extend(p),new maplibregl.LngLatBounds(outline[0],outline[0]));
     map.fitBounds(bounds,{padding:46,maxZoom:15,duration:0});
