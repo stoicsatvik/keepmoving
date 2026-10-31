@@ -8,9 +8,11 @@ async function loadMapEngine() {
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./style.css";
 import { renderLanding, initLanding, stopLanding } from "./landing.js";
-import "./landing.css";
-import "./game-theme.css";
-import "./urban.css";
+import "./v3.css";
+import "./v3-game.css";
+
+
+
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -101,6 +103,7 @@ function stopRoom(){
   if(clockTimer)clearInterval(clockTimer);clockTimer=null;
   if(gpsTimer)clearInterval(gpsTimer);gpsTimer=null;
   if(gpsWatch!==null && navigator.geolocation)navigator.geolocation.clearWatch(gpsWatch);gpsWatch=null;
+  gps=null;lastLocationSent=0;
   if(map){map.remove();map=null}selfMarker=null;revealMarkers=[];currentState=null;
 }
 function leaveRoom(){
@@ -134,6 +137,7 @@ function shell(){
         <section class="panel rules-small"><div class="side-title">SAFETY & RULES</div>
           <p>No trespassing or road chases. Pausing GPS, switching apps or locking the screen may stop updates.</p>
           <p>GPS boundary warnings aren't automatic captures. A tag needs recent GPS proximity and Shadow confirmation.</p>
+          <p><a href="privacy.html" target="_blank" rel="noopener">Privacy</a> · <a href="terms.html" target="_blank" rel="noopener">Terms & game rules</a></p>
         </section>
       </aside>
     </div>
