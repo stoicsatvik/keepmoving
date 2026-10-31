@@ -310,7 +310,7 @@
  .lp .urban-bottom-strip>div b{font-size:8px}
  .lp .urban-bottom-strip>div b:not(:last-child):after{content:""}
  .lp .urban-frame-corner{display:none}
- .lp .urban-photo{background-position:51% center}
+ .lp .urban-photo{background-position:51% center;background-image:url("https://images.unsplash.com/photo-1763525396966-f4ee548bf552?auto=format&fit=crop&w=950&q=73")}
  .lp .urban-hero-fade{background:linear-gradient(180deg,#070C10ED 0%,#070C10D9 38%,#070C10B8 70%,#070C10FB 100%)}
 }
 @media(prefers-reduced-motion:reduce){
