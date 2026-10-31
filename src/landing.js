@@ -131,22 +131,26 @@ export function initLanding(){
  const toggle=root.querySelector("#km-toggle"),restart=root.querySelector("#km-restart");
  reduced=!!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
  paused=reduced;last=performance.now();
+ let lastScene=-1;
  const paint=()=>{
   if(!root)return;
   const index=Math.min(ACTS.length-1,Math.floor(elapsed/5)),a=ACTS[index];
-  root.dataset.scene=String(index);
-  root.querySelector("#km-chapter-label").textContent=`0${index+1} / ${a.name}`;
-  root.querySelector("#km-chapter-title").textContent=a.title;
-  root.querySelector("#km-chapter-description").textContent=a.story;
-  root.querySelector("#km-map-status").textContent=a.event;
-  root.querySelector("#km-chat-event").textContent=a.event;
-  root.querySelector("#km-radius").textContent=a.radius;
+  if (index !== lastScene) {
+    lastScene=index;
+    root.dataset.scene=String(index);
+    root.querySelector("#km-chapter-label").textContent=`0${index+1} / ${a.name}`;
+    root.querySelector("#km-chapter-title").textContent=a.title;
+    root.querySelector("#km-chapter-description").textContent=a.story;
+    root.querySelector("#km-map-status").textContent=a.event;
+    root.querySelector("#km-chat-event").textContent=a.event;
+    root.querySelector("#km-radius").textContent=a.radius;
+    root.querySelectorAll(".km-message").forEach(n=>n.classList.toggle("is-visible",Number(n.dataset.unlock)<=index));
+    sceneSteps.forEach((n,i)=>n.setAttribute("aria-pressed",String(index===i)));
+  }
   root.querySelector("#km-clock").textContent=clock(Math.round(1800*(1-elapsed/TOTAL)));
   root.querySelector("#km-elapsed").textContent=clock(elapsed)+" / 00:25";
   root.querySelector("#km-progress").style.width=(elapsed/TOTAL*100)+"%";
-  root.querySelectorAll(".km-message").forEach(n=>n.classList.toggle("is-visible",Number(n.dataset.unlock)<=index));
   sceneSteps.forEach((n,i)=>{
-   n.setAttribute("aria-pressed",String(index===i));
    n.querySelector("i").style.width=Math.min(100,Math.max(0,(elapsed-i*5)/5*100))+"%";
   });
   toggle.textContent=paused?"PLAY ▶":"PAUSE Ⅱ";
