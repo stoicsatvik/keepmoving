@@ -10,6 +10,7 @@ import "./style.css";
 import { renderLanding, initLanding, stopLanding } from "./landing.js";
 import "./landing.css";
 import "./game-theme.css";
+import "./urban.css";
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
