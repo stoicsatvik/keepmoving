@@ -1,47 +1,47 @@
 
 const createRules = (playerName, esc) => `
   <form id="create-form" class="lp-form">
-    <label class="lp-field">YOUR CALLSIGN
-      <input name="name" maxlength="24" required autocomplete="nickname" placeholder="e.g. Ghost_07" value="${esc(playerName)}"/>
+    <label class="lp-field">YOUR NAME
+      <input name="name" maxlength="24" required autocomplete="nickname" placeholder="What should we call you?" value="${esc(playerName)}"/>
     </label>
     <div class="lp-form-row">
-      <label class="lp-field">HUNT RADIUS <span>(METRES)</span>
+      <label class="lp-field">PLAY AREA RADIUS <span>(METRES)</span>
         <input name="radius" type="number" min="100" max="100000" step="100" required value="1000" inputmode="numeric"/>
       </label>
-      <label class="lp-field">GAME TIME <span>(MINUTES)</span>
+      <label class="lp-field">ROUND LENGTH <span>(MINUTES)</span>
         <input name="duration" type="number" min="5" max="180" step="1" required value="30" inputmode="numeric"/>
       </label>
     </div>
     <details class="lp-advanced">
-      <summary>FIELD CONFIGURATION <span>+ ADVANCED RULES</span></summary>
+      <summary>PERSONALISE THE GAME <span>+ OPTIONAL SETTINGS</span></summary>
       <div class="lp-form-row lp-advanced-grid">
-        <label class="lp-field">HEAD START <span>(MIN)</span>
+        <label class="lp-field">TIME TO HIDE <span>(MIN)</span>
           <input name="headstart" type="number" min="0" max="10" step="1" required value="3" inputmode="numeric"/>
         </label>
-        <label class="lp-field">RADAR PING <span>(SEC)</span>
+        <label class="lp-field">LOCATION HINT <span>(SEC)</span>
           <input name="reveal" type="number" min="30" max="600" step="30" required value="180" inputmode="numeric"/>
         </label>
-        <label class="lp-field">ZONE SHRINK <span>(MIN)</span>
+        <label class="lp-field">ZONE CHANGES <span>(MIN)</span>
           <input name="shrink" type="number" min="1" max="30" step="1" required value="10" inputmode="numeric"/>
         </label>
       </div>
       <p class="lp-advanced-note">Range: 100 m–100 km. Match: 5–180 minutes. Only the host configures these settings.</p>
     </details>
-    <button type="submit" class="lp-submit lp-submit-red"><span>CREATE A HUNT</span><span aria-hidden="true">↗</span></button>
-    <p class="lp-input-note">Your device's GPS sets the zone centre. Location permission required.</p>
+    <button type="submit" class="lp-submit lp-submit-red"><span>CREATE YOUR GAME</span><span aria-hidden="true">↗</span></button>
+    <p class="lp-input-note">Your location sets the centre of the play area. Location permission is required.</p>
   </form>`;
 
 const joinRules = (playerName, esc) => `
   <form id="join-form" class="lp-form">
-    <label class="lp-field">YOUR CALLSIGN
-      <input name="name" maxlength="24" required autocomplete="nickname" placeholder="e.g. Ghost_07" value="${esc(playerName)}"/>
+    <label class="lp-field">YOUR NAME
+      <input name="name" maxlength="24" required autocomplete="nickname" placeholder="What should we call you?" value="${esc(playerName)}"/>
     </label>
-    <label class="lp-field">ROOM ACCESS CODE
+    <label class="lp-field">FRIEND'S ROOM CODE
       <input class="lp-code-input" name="code" maxlength="6" minlength="6" required
              autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXXXX"/>
     </label>
-    <button type="submit" class="lp-submit lp-submit-ghost"><span>ENTER THE FIELD</span><span aria-hidden="true">↗</span></button>
-    <p class="lp-input-note">Get the code from your host. Everyone shares their location only during active games.</p>
+    <button type="submit" class="lp-submit lp-submit-ghost"><span>JOIN THEIR GAME</span><span aria-hidden="true">↗</span></button>
+    <p class="lp-input-note">Ask a friend for their room code. Location sharing is only for the game.</p>
   </form>`;
 
 function renderCityArt(){
@@ -203,7 +203,7 @@ return `
           <span class="lp-film-coordinates">ANIMATED EXAMPLE · NOT REAL GPS</span>
         </div>
         <div class="lp-scene-text">
-          <span class="lp-scene-kicker" id="lp-scene-kicker">PART 01 · THE HEAD START</span>
+          <span class="lp-scene-kicker" id="lp-scene-kicker">PART 01 · THE TIME TO HIDE</span>
           <h3 id="lp-preview-heading"><span id="lp-scene-title">You have three minutes.</span></h3>
           <p id="lp-scene-description">A familiar place suddenly feels full of possibilities.</p>
         </div>
@@ -281,7 +281,7 @@ return `
 }
 
 const SCENES = [
- { title:"You have three minutes.",kicker:"PART 01 · THE HEAD START",description:"A familiar place suddenly feels full of possibilities.",clock:"29:57",radius:"1,000 m",phase:0 },
+ { title:"You have three minutes.",kicker:"PART 01 · THE TIME TO HIDE",description:"A familiar place suddenly feels full of possibilities.",clock:"29:57",radius:"1,000 m",phase:0 },
  { title:"The game is on.",kicker:"PART 02 · SOMEONE'S SEEKING",description:"Around every corner: a new way to surprise your friends.",clock:"26:08",radius:"1,000 m",phase:1 },
  { title:"A little too close.",kicker:"PART 03 · THE RADAR REVEAL",description:"One quick glimpse. A dozen directions to go.",clock:"20:31",radius:"700 m",phase:2 },
  { title:"One last hiding place.",kicker:"PART 04 · THE FINAL MOMENTS",description:"The play area is smaller. The memories are getting bigger.",clock:"04:12",radius:"343 m",phase:3 },
